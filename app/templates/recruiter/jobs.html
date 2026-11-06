@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Job Postings - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+        <div>
+            <h3 class="fw-bold mb-1" style="color: var(--sh-primary);">Job Postings Management</h3>
+            <p class="text-muted small mb-0">Create, edit, close, and review candidate rankings across all roles.</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="{{ url_for('recruiter.job_create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Post New Job
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for job in jobs %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0 d-flex flex-column">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge {% if job.status == 'Open' %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ job.status }}
+                        </span>
+                        <span class="text-muted small"><i class="bi bi-calendar3 me-1"></i>{{ job.created_at.strftime('%b %d, %Y') }}</span>
+                    </div>
+
+                    <h5 class="fw-bold mb-1" style="color: var(--sh-primary);">
+                        <a href="{{ url_for('recruiter.job_detail', job_id=job.id) }}" class="text-decoration-none text-reset">
+                            {{ job.title }}
+                        </a>
+                    </h5>
+                    <div class="text-muted small mb-3">
+                        <i class="bi bi-building me-1"></i>{{ job.department }} &bull;
+                        <i class="bi bi-geo-alt me-1"></i>{{ job.location }} &bull;
+                        <i class="bi bi-briefcase me-1"></i>{{ job.employment_type }}
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="text-muted small d-block mb-1">Required Skills:</span>
+                        <div class="d-flex flex-wrap gap-1">
+                            {% for skill in job.get_skills_list()[:5] %}
+                            <span class="badge-skill">{{ skill }}</span>
+                            {% endfor %}
+                            {% if job.get_skills_list()|length > 5 %}
+                            <span class="badge-skill">+{{ job.get_skills_list()|length - 5 }} more</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="p-2 bg-light rounded d-flex justify-content-around text-center mb-3">
+                        <div>
+                            <span class="text-muted small d-block">Min Exp</span>
+                            <span class="fw-bold">{{ job.min_experience }}+ Yrs</span>
+                        </div>
+                        <div class="vr"></div>
+                        <div>
+                            <span class="text-muted small d-block">Applicants</span>
+                            <span class="fw-bold text-primary">{{ job.applications|length }}</span>
+                        </div>
+                        <div class="vr"></div>
+                        <div>
+                            <span class="text-muted small d-block">Shortlisted</span>
+                            <span class="fw-bold text-success">
+                                {{ job.applications | selectattr('match_score', 'ge', 70) | list | length }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-top-0 pt-0 pb-3 d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('recruiter.job_detail', job_id=job.id) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-people me-1"></i> View Rankings
+                    </a>
+                    <div class="btn-group">
+                        <a href="{{ url_for('recruiter.job_edit', job_id=job.id) }}" class="btn btn-sm btn-light border text-muted" title="Edit Job">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form action="{{ url_for('recruiter.job_toggle_status', job_id=job.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-light border text-muted" title="Toggle Status">
+                                <i class="bi {% if job.status == 'Open' %}bi-toggle-on text-success{% else %}bi-toggle-off text-muted{% endif %}"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-5">
+            <div class="p-5 bg-white rounded border">
+                <i class="bi bi-briefcase fs-1 text-muted d-block mb-3"></i>
+                <h4 class="fw-bold">No Job Postings Yet</h4>
+                <p class="text-muted">Create your first role opening to start receiving and screening resumes with AI.</p>
+                <a href="{{ url_for('recruiter.job_create') }}" class="btn btn-primary mt-2">
+                    <i class="bi bi-plus-circle me-1"></i> Post Your First Job
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

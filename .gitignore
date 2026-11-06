@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Database
+data/*.db
+data/*.sqlite3
+
+# Uploaded candidate files
+uploads/resumes/*
+!uploads/resumes/.gitkeep
+
+# Environment variables
+.env
+.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+

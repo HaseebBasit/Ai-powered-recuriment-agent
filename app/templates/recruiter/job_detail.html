@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title }} - Ranked Applicants - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4">
+    <!-- Header Navigation & Action Bar -->
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <a href="{{ url_for('recruiter.jobs_list') }}" class="btn btn-sm btn-light border text-muted">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <span class="badge {% if job.status == 'Open' %}bg-success{% else %}bg-secondary{% endif %}">
+                    {{ job.status }}
+                </span>
+                <span class="text-muted small">&bull; {{ job.department }} &bull; {{ job.location }} &bull; {{ job.employment_type }}</span>
+            </div>
+            <h3 class="fw-bold mb-1" style="color: var(--sh-primary);">{{ job.title }}</h3>
+            <p class="text-muted small mb-0">
+                Minimum Experience: <strong>{{ job.min_experience }}+ Years</strong> &bull; 
+                Total Applicants: <strong>{{ applications|length }}</strong>
+            </p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <!-- Export Options -->
+            <a href="{{ url_for('recruiter.export_csv', job_id=job.id) }}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-filetype-csv me-1"></i> Export CSV
+            </a>
+            <a href="{{ url_for('recruiter.export_pdf', job_id=job.id) }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF Report
+            </a>
+            <a href="{{ url_for('recruiter.job_edit', job_id=job.id) }}" class="btn btn-light border btn-sm">
+                <i class="bi bi-pencil me-1"></i> Edit Job
+            </a>
+        </div>
+    </div>
+
+    <!-- Required Skills Tag Pill Bar -->
+    <div class="card p-3 mb-4 shadow-sm border-0">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="text-muted small fw-semibold me-2"><i class="bi bi-bullseye me-1"></i>Target Screening Skills:</span>
+            {% for skill in job.get_skills_list() %}
+            <span class="badge-skill px-2 py-1"><i class="bi bi-check2 text-success me-1"></i>{{ skill }}</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Filter Bar for Ranked List -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body py-3">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="applicantSearchInput" class="form-control border-start-0" placeholder="Filter candidates by name or skill...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select id="applicantScoreFilter" class="form-select">
+                        <option value="all">Match Score: All Scores</option>
+                        <option value="high">High Match (70% - 100%)</option>
+                        <option value="medium">Medium Match (40% - 69%)</option>
+                        <option value="low">Low Match (0% - 39%)</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="applicantStatusFilter" class="form-select">
+                        <option value="all">Status: All Statuses</option>
+                        <option value="shortlist">Shortlisted</option>
+                        <option value="hold">On Hold</option>
+                        <option value="reject">Rejected</option>
+                        <option value="applied">Applied / New</option>
+                    </select>
+                </div>
+                <div class="col-md-1 text-md-end text-muted small">
+                    <span id="filteredCount" class="fw-bold text-primary">{{ applications|length }}</span> cand.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ranked Applicant Table (Exact Style from Brand Identity Guide Page 2) -->
+    <div class="card shadow-sm border-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-smarthire align-middle mb-0" id="rankedApplicantsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Applicant</th>
+                        <th style="width: 280px;">Match Score</th>
+                        <th style="width: 140px;">Status</th>
+                        <th>Matching Skills</th>
+                        <th class="text-end" style="width: 130px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr data-name="{{ app.applicant_name }}" 
+                        data-skills="{{ app.get_matching_skills_list()|join(' ') }}"
+                        data-status="{{ app.status }}"
+                        data-score="{{ app.match_score }}">
+                        <td class="fw-bold text-muted">{{ loop.index }}</td>
+                        <td>
+                            <div class="fw-bold text-dark">{{ app.applicant_name }}</div>
+                            <div class="text-muted small">{{ app.applicant_email }}</div>
+                        </td>
+                        <td>
+                            <!-- Visual Match Score Progress Bar from Brand Guide -->
+                            <div class="score-bar-wrapper">
+                                <div class="score-progress">
+                                    <div class="score-progress-bar {% if app.match_score >= 70 %}score-high{% elif app.match_score >= 40 %}score-medium{% else %}score-low{% endif %}" 
+                                         style="width: {{ app.match_score }}%;"></div>
+                                </div>
+                                <span class="score-label {% if app.match_score >= 70 %}score-high{% elif app.match_score >= 40 %}score-medium{% else %}score-low{% endif %}">
+                                    {{ app.match_score }}%
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <!-- Functional Status Badges from Brand Guide -->
+                            <span class="badge {{ app.status_badge_class }}">
+                                {{ app.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for s in app.get_matching_skills_list()[:3] %}
+                                <span class="badge-skill badge-skill-match">{{ s }}</span>
+                                {% endfor %}
+                                {% if app.get_matching_skills_list()|length > 3 %}
+                                <span class="badge-skill">+{{ app.get_matching_skills_list()|length - 3 }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ url_for('recruiter.applicant_detail', app_id=app.id) }}" class="btn btn-sm btn-outline-primary">
+                                View Profile
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            No applications received for this job posting yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Register - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="SmartHire" style="height: 50px;" class="mb-3">
+                        <h4 class="fw-bold" style="color: var(--sh-primary);">Create Your Account</h4>
+                        <p class="text-muted small">Join SmartHire to streamline recruitment or screen your career profile with AI.</p>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('auth.register') }}">
+                        <!-- Role Selection Tabs -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold small d-block">Select Account Type</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="role" id="role_applicant" value="applicant" checked onchange="toggleCompanyField()">
+                                <label class="btn btn-outline-primary py-2" for="role_applicant">
+                                    <i class="bi bi-person me-1"></i> Job Applicant
+                                </label>
+
+                                <input type="radio" class="btn-check" name="role" id="role_recruiter" value="recruiter" onchange="toggleCompanyField()">
+                                <label class="btn btn-outline-primary py-2" for="role_recruiter">
+                                    <i class="bi bi-building me-1"></i> Recruiter / Employer
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="full_name" class="form-label fw-semibold small">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="full_name" name="full_name" placeholder="e.g. Ayesha Khan" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold small">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="name@domain.com" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label fw-semibold small">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="+1 (555) 000-0000">
+                            </div>
+                            <div class="col-md-6 mb-3" id="companyWrapper" style="display: none;">
+                                <label for="company" class="form-label fw-semibold small">Company / Institution</label>
+                                <input type="text" class="form-control" id="company" name="company" placeholder="e.g. TechCorp">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-semibold small">Password <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="At least 6 characters" minlength="6" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                            <i class="bi bi-check-circle me-1"></i> Complete Registration
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <p class="small text-muted mb-0">Already registered? <a href="{{ url_for('auth.login') }}" class="fw-semibold text-decoration-none" style="color: var(--sh-primary);">Log in here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleCompanyField() {
+    const isRecruiter = document.getElementById('role_recruiter').checked;
+    const companyWrapper = document.getElementById('companyWrapper');
+    companyWrapper.style.display = isRecruiter ? 'block' : 'none';
+}
+</script>
+{% endblock %}
+

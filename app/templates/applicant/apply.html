@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for {{ job.title }} - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('applicant.job_detail', job_id=job.id) }}" class="btn btn-sm btn-light border me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <h3 class="fw-bold mb-0" style="color: var(--sh-primary);">Submit Your Application</h3>
+                    <p class="text-muted small mb-0">Applying for: <strong>{{ job.title }}</strong> ({{ job.department }})</p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST" enctype="multipart/form-data" id="applicationForm">
+                        <h5 class="fw-bold mb-3 text-dark">1. Personal &amp; Contact Details</h5>
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-semibold small">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ current_user.full_name if current_user.is_authenticated else '' }}" 
+                                   placeholder="e.g. Ayesha Khan" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label fw-semibold small">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ current_user.email if current_user.is_authenticated else '' }}" 
+                                       placeholder="name@example.com" required>
+                                <div class="form-text small">Automated application status updates will be sent here.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label fw-semibold small">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       value="{{ current_user.phone if current_user.is_authenticated and current_user.phone else '' }}" 
+                                       placeholder="+1 (555) 000-0000">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold mb-3 text-dark">2. Upload Resume / CV</h5>
+                        <div class="p-4 rounded border mb-3" style="background-color: #F8FAFC; border-style: dashed !important; border-width: 2px !important; border-color: #CBD5E1 !important;">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-file-earmark-arrow-up display-5" style="color: var(--sh-primary);"></i>
+                                <h6 class="fw-bold mt-2 mb-1">Select your resume file</h6>
+                                <p class="text-muted small mb-0">Supported formats: <strong>PDF (.pdf)</strong> or <strong>Word (.docx)</strong> up to 10MB</p>
+                            </div>
+
+                            <input type="file" class="form-control" id="resume" name="resume" accept=".pdf,.docx" required onchange="validateFile(this)">
+                            <div id="fileFeedback" class="small mt-2 text-center text-muted"></div>
+                        </div>
+
+                        <div class="p-3 bg-light rounded border mb-4">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-stars fs-4 me-2" style="color: var(--sh-ai);"></i>
+                                <div class="small text-muted">
+                                    <strong>AI Screening Engine:</strong> Once uploaded, SmartHire will extract your skills, compute your ATS match score against <strong>{{ job.title }}</strong>, and generate tailored feedback to help you prepare for the interview.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ url_for('applicant.job_detail', job_id=job.id) }}" class="btn btn-light border">Cancel</a>
+                            <button type="submit" class="btn btn-cta-amber px-4 py-2" id="submitBtn">
+                                <i class="bi bi-cloud-arrow-up me-1"></i> Submit Application &amp; Analyze
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function validateFile(input) {
+    const file = input.files[0];
+    const feedback = document.getElementById('fileFeedback');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (file) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (ext !== 'pdf' && ext !== 'docx') {
+            feedback.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Only PDF (.pdf) and Word (.docx) files are supported.</span>';
+            submitBtn.disabled = true;
+            return;
+        }
+        
+        // Size validation (10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            feedback.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>File size exceeds 10MB limit.</span>';
+            submitBtn.disabled = true;
+            return;
+        }
+        
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+        feedback.innerHTML = `<span class="text-success"><i class="bi bi-check-circle me-1"></i>Selected: <strong>${file.name}</strong> (${sizeMb} MB)</span>`;
+        submitBtn.disabled = false;
+    }
+}
+
+document.getElementById('applicationForm').addEventListener('submit', () => {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Analyzing Resume with AI...';
+});
+</script>
+{% endblock %}
+

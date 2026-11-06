@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}AI Resume Feedback - {{ job.title }} - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header Navigation -->
+    <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ url_for('applicant.dashboard') }}" class="btn btn-sm btn-light border text-muted">
+                <i class="bi bi-arrow-left me-1"></i> My Applications
+            </a>
+            <div>
+                <h3 class="fw-bold mb-0" style="color: var(--sh-primary);">AI Resume Feedback &amp; Preparation</h3>
+                <span class="text-muted small">Target Role: <strong>{{ job.title }}</strong> &bull; Submitted by {{ application.applicant_name }}</span>
+            </div>
+        </div>
+
+        <span class="badge {{ application.status_badge_class }} fs-6">
+            {{ application.status }}
+        </span>
+    </div>
+
+    <div class="row g-4">
+        <!-- Main Column: AI Analysis & Recommendations -->
+        <div class="col-lg-8">
+            <!-- 1. ATS Match Score Overview -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><i class="bi bi-speedometer2 text-primary me-2"></i>ATS Compatibility Score</span>
+                    <span class="badge badge-ai"><i class="bi bi-stars"></i> SmartHire AI</span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex flex-column flex-sm-row align-items-center gap-4 mb-3">
+                        <div class="text-center p-3 rounded" style="background-color: #F8FAFC; min-width: 140px;">
+                            <div class="display-5 fw-bold {% if application.match_score >= 70 %}text-success{% elif application.match_score >= 40 %}text-warning{% else %}text-danger{% endif %}">
+                                {{ application.match_score }}%
+                            </div>
+                            <span class="text-muted small fw-semibold text-uppercase">Role Alignment</span>
+                        </div>
+                        <div class="flex-grow-1 w-100">
+                            <h6 class="fw-bold text-dark mb-1">AI Screening Justification</h6>
+                            <p class="text-muted small mb-2" style="line-height: 1.6;">
+                                {{ application.match_justification }}
+                            </p>
+                            <!-- Visual Match Bar -->
+                            <div class="score-progress" style="height: 10px;">
+                                <div class="score-progress-bar {% if application.match_score >= 70 %}score-high{% elif application.match_score >= 40 %}score-medium{% else %}score-low{% endif %}" 
+                                     style="width: {{ application.match_score }}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Skill Match vs Gaps -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded border h-100">
+                                <h6 class="fw-bold text-success small mb-2 d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Recognized Matching Skills
+                                </h6>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for s in matching_skills %}
+                                    <span class="badge-skill badge-skill-match">{{ s }}</span>
+                                    {% else %}
+                                    <span class="text-muted small">No direct keyword overlap found.</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded border h-100">
+                                <h6 class="fw-bold text-danger small mb-2 d-flex align-items-center">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Recommended Skills to Add
+                                </h6>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for s in missing_skills %}
+                                    <span class="badge-skill badge-skill-missing">{{ s }}</span>
+                                    {% else %}
+                                    <span class="text-success small"><i class="bi bi-check2-all"></i> Great job! You cover all required skills.</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. AI Improvement Tips Card (Teal Accent) -->
+            <div class="card shadow-sm border-0 mb-4" style="border-left: 4px solid var(--sh-ai) !important;">
+                <div class="card-header bg-white d-flex align-items-center">
+                    <i class="bi bi-lightbulb-fill fs-5 me-2" style="color: var(--sh-ai);"></i>
+                    <span class="fw-bold" style="color: var(--sh-ai);">Actionable Resume Optimization Guidance</span>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted small mb-3">
+                        To maximize your interview chances for <strong>{{ job.title }}</strong> or future technical positions, our AI screening engine recommends the following improvements:
+                    </p>
+                    <div class="p-3 bg-light rounded border text-dark small" style="white-space: pre-line; line-height: 1.7; font-family: inherit;">
+                        {{ application.ai_feedback }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Tailored Interview Prep Questions Preview -->
+            <div class="card-ai-feature mb-4">
+                <div class="card-header">
+                    <span><i class="bi bi-question-circle me-2"></i>Tailored Interview Preparation Questions</span>
+                    <span class="badge bg-white text-dark small">AI Generated</span>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <p class="text-muted small mb-3">
+                        Practice answering these questions before speaking with the hiring manager:
+                    </p>
+                    <ol class="list-group list-group-numbered list-group-flush">
+                        {% for question in application.get_interview_questions_list() %}
+                        <li class="list-group-item px-0 py-3 border-bottom small text-dark" style="line-height: 1.6;">
+                            {{ question }}
+                        </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Target Job Summary -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white">
+                    <span class="fw-bold"><i class="bi bi-briefcase text-primary me-2"></i>Target Role Details</span>
+                </div>
+                <div class="card-body">
+                    <h5 class="fw-bold text-dark mb-1">{{ job.title }}</h5>
+                    <div class="text-muted small mb-3">
+                        {{ job.department }} &bull; {{ job.location }}<br>
+                        {{ job.employment_type }} &bull; {{ job.min_experience }}+ Yrs Required
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="text-muted small d-block mb-1">Required Competencies:</span>
+                        <div class="d-flex flex-wrap gap-1">
+                            {% for req in job.get_skills_list() %}
+                            <span class="badge-skill">{{ req }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="text-muted small d-block mb-1">Resume File Analyzed:</span>
+                        <span class="badge bg-light text-dark border"><i class="bi bi-file-earmark-text me-1"></i>{{ application.resume_filename }}</span>
+                    </div>
+
+                    <hr>
+                    <a href="{{ url_for('applicant.job_detail', job_id=job.id) }}" class="btn btn-outline-primary btn-sm w-100">
+                        View Full Job Description
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

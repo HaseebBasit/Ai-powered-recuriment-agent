@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block title %}Recruiter Dashboard — AI-Powered Recruitment Agent{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Left Sidebar (Ref: UI Page 6 Left Sidebar) -->
+    <aside class="sidebar-navy">
+        <div class="sidebar-brand">
+            <i class="bi bi-shield-lock-fill fs-4 me-2"></i>
+            <span>Recruiter Center</span>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('recruiter.dashboard') }}" class="sidebar-nav-link active">
+                    <i class="bi bi-grid-fill"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('recruiter.jobs_list') }}" class="sidebar-nav-link">
+                    <i class="bi bi-kanban"></i>
+                    <span>Jobs</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('recruiter.all_applicants') }}" class="sidebar-nav-link">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Applicants</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('recruiter.shortlisted_candidates') }}" class="sidebar-nav-link">
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <span>Shortlisted</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('recruiter.reports_hub') }}" class="sidebar-nav-link">
+                    <i class="bi bi-file-earmark-bar-graph"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('recruiter.messages') }}" class="sidebar-nav-link">
+                    <i class="bi bi-chat-left-text"></i>
+                    <span>Messages</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('recruiter.emails_log') }}" class="sidebar-nav-link">
+                    <i class="bi bi-envelope-check"></i>
+                    <span>Email Automation</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('recruiter.settings') }}" class="sidebar-nav-link">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item mt-4 pt-3 border-top border-secondary">
+                <a href="{{ url_for('auth.logout') }}" class="sidebar-nav-link text-danger">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-main">
+        <!-- Top Welcome Header (Ref: UI Page 6 Welcome Header) -->
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Welcome, {{ current_user.full_name }} 👋</h3>
+                <p class="text-muted small mb-0">Here's what's happening with your jobs and candidate pipelines.</p>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex gap-2">
+                    <form method="POST" action="{{ url_for('recruiter.trigger_daily_summary_manual') }}">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Dispatch daily applicant summary">
+                            <i class="bi bi-clock-history me-1"></i> Trigger Digest
+                        </button>
+                    </form>
+                    <a href="{{ url_for('recruiter.job_create') }}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i> Post a Job
+                    </a>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 border-start ps-3">
+                    <div class="text-end d-none d-sm-block">
+                        <div class="fw-bold small">{{ current_user.full_name }}</div>
+                        <span class="text-muted small" style="font-size: 11px;">Recruiter</span>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120" alt="Avatar" class="rounded-circle border" style="width: 44px; height: 44px; object-fit: cover;">
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 Metric Cards Row (Ref: UI Page 6 4 Metric Cards) -->
+        <div class="row g-3 mb-4">
+            <!-- Active Jobs -->
+            <div class="col-6 col-lg-3">
+                <div class="metric-card-simple">
+                    <div class="metric-icon-box bg-light text-primary">
+                        <i class="bi bi-briefcase"></i>
+                    </div>
+                    <div>
+                        <div class="fs-3 fw-bold text-dark">{{ '%02d' % active_jobs }}</div>
+                        <div class="text-muted small">Active Jobs</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Applicants -->
+            <div class="col-6 col-lg-3">
+                <div class="metric-card-simple">
+                    <div class="metric-icon-box bg-light text-info">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div>
+                        <div class="fs-3 fw-bold text-dark">{{ total_applicants }}</div>
+                        <div class="text-muted small">Total Applicants</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shortlisted -->
+            <div class="col-6 col-lg-3">
+                <div class="metric-card-simple">
+                    <div class="metric-icon-box bg-light text-success">
+                        <i class="bi bi-person-check"></i>
+                    </div>
+                    <div>
+                        <div class="fs-3 fw-bold text-success">{{ shortlisted_count }}</div>
+                        <div class="text-muted small">Shortlisted</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interviews -->
+            <div class="col-6 col-lg-3">
+                <div class="metric-card-simple">
+                    <div class="metric-icon-box bg-light text-warning">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+                    <div>
+                        <div class="fs-3 fw-bold text-dark">{{ interviews_count }}</div>
+                        <div class="text-muted small">Interviews</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Applicants Table Section (Ref: UI Page 6 Table) -->
+        <div class="card shadow-sm border mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="fw-bold mb-0">Recent Applicants</h5>
+                <a href="{{ url_for('recruiter.all_applicants') }}" class="btn btn-sm btn-outline-primary">
+                    View All Candidates
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-smarthire align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Applicant</th>
+                            <th>Job Role</th>
+                            <th>Match Score</th>
+                            <th>Status</th>
+                            <th>Applied On</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in recent_apps %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-dark">{{ app.applicant_name }}</div>
+                                <div class="text-muted small">{{ app.applicant_email }}</div>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-secondary">{{ app.job.title }}</span>
+                            </td>
+                            <td style="min-width: 150px;">
+                                <div class="score-bar-wrapper">
+                                    <div class="score-progress">
+                                        <div class="score-progress-bar score-{{ app.score_color_class }}" style="width: {{ app.match_score }}%;"></div>
+                                    </div>
+                                    <span class="score-label score-{{ app.score_color_class }}">{{ app.match_score }}%</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge {{ app.status_badge_class }}">
+                                    {{ app.status }}
+                                </span>
+                            </td>
+                            <td class="text-muted small">
+                                {{ app.applied_at.strftime('%b %d, %Y') }}
+                            </td>
+                            <td class="text-end">
+                                <a href="{{ url_for('recruiter.applicant_detail', app_id=app.id) }}" class="btn btn-sm btn-outline-primary py-1 px-3">
+                                    View Profile
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="bi bi-people fs-1 text-muted d-block mb-2"></i>
+                                <h6 class="fw-bold">No Applicants Yet</h6>
+                                <p class="text-muted small">Candidates who submit resumes to your open positions will appear here.</p>
+                                <a href="{{ url_for('recruiter.job_create') }}" class="btn btn-sm btn-primary">Post a New Job</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card p-3 shadow-sm border h-100">
+                    <h6 class="fw-bold mb-3">Applications per Job Role</h6>
+                    <canvas id="jobApplicantsChart" height="220"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card p-3 shadow-sm border h-100">
+                    <h6 class="fw-bold mb-3">Applicant Status Distribution</h6>
+                    <canvas id="statusDonutChart" height="220"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Bar Chart
+    const barCtx = document.getElementById("jobApplicantsChart");
+    if (barCtx) {
+        new Chart(barCtx, {
+            type: "bar",
+            data: {
+                labels: {{ job_chart_labels|safe }},
+                datasets: [{
+                    label: "Applications",
+                    data: {{ job_chart_counts|safe }},
+                    backgroundColor: "#3730A3",
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { precision: 0 } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    // Donut Chart
+    const donutCtx = document.getElementById("statusDonutChart");
+    if (donutCtx) {
+        new Chart(donutCtx, {
+            type: "doughnut",
+            data: {
+                labels: ["Shortlisted", "On Hold", "Rejected", "Applied"],
+                datasets: [{
+                    data: {{ status_counts|safe }},
+                    backgroundColor: ["#16A34A", "#F59E0B", "#DC2626", "#0EA5E9"],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: "bottom" }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

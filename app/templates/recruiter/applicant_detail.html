@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}{{ application.applicant_name }} - AI Evaluation - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4">
+    <!-- Back to Job Rankings -->
+    <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ url_for('recruiter.job_detail', job_id=job.id) }}" class="btn btn-sm btn-light border text-muted">
+                <i class="bi bi-arrow-left me-1"></i> Back to Ranked Candidates
+            </a>
+            <div>
+                <h3 class="fw-bold mb-0" style="color: var(--sh-primary);">{{ application.applicant_name }}</h3>
+                <span class="text-muted small">Application for <strong>{{ job.title }}</strong> &bull; Applied on {{ application.applied_at.strftime('%B %d, %Y') }}</span>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge {{ application.status_badge_class }} fs-6">
+                {{ application.status }}
+            </span>
+            <a href="{{ url_for('recruiter.download_resume', app_id=application.id) }}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-file-earmark-arrow-down me-1"></i> Download Resume ({{ application.resume_filename }})
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Column: AI Match & Screening Engine Analysis -->
+        <div class="col-lg-7">
+            <!-- 1. AI Match Score Card -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><i class="bi bi-cpu text-primary me-2"></i>AI Resume Match Analysis</span>
+                    <span class="badge badge-ai"><i class="bi bi-stars"></i> SmartHire AI</span>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-4 mb-4 pb-3 border-bottom">
+                        <div class="text-center p-3 rounded" style="background-color: #F8FAFC; min-width: 130px;">
+                            <div class="display-5 fw-bold {% if application.match_score >= 70 %}text-success{% elif application.match_score >= 40 %}text-warning{% else %}text-danger{% endif %}">
+                                {{ application.match_score }}%
+                            </div>
+                            <span class="text-muted small fw-semibold text-uppercase">ATS Match Score</span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold text-dark mb-1">Screening Summary &amp; Justification</h6>
+                            <p class="text-muted small mb-2" style="line-height: 1.6;">
+                                {{ application.match_justification }}
+                            </p>
+                            <!-- Progress Bar -->
+                            <div class="score-progress" style="height: 10px;">
+                                <div class="score-progress-bar {% if application.match_score >= 70 %}score-high{% elif application.match_score >= 40 %}score-medium{% else %}score-low{% endif %}" 
+                                     style="width: {{ application.match_score }}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Matching vs Missing Skills Breakdown -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded border h-100">
+                                <h6 class="fw-bold text-success small mb-2 d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Matching Skills ({{ matching_skills|length }})
+                                </h6>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for s in matching_skills %}
+                                    <span class="badge-skill badge-skill-match">{{ s }}</span>
+                                    {% else %}
+                                    <span class="text-muted small">No direct keyword overlap identified.</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded border h-100">
+                                <h6 class="fw-bold text-danger small mb-2 d-flex align-items-center">
+                                    <i class="bi bi-x-circle-fill me-1"></i> Missing / Gap Skills ({{ missing_skills|length }})
+                                </h6>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for s in missing_skills %}
+                                    <span class="badge-skill badge-skill-missing">{{ s }}</span>
+                                    {% else %}
+                                    <span class="text-success small"><i class="bi bi-check2-all"></i> All core skills matched!</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. AI Feature Card: Tailored Interview Questions (Brand Guide Page 2 & 3) -->
+            <div class="card-ai-feature mb-4">
+                <div class="card-header">
+                    <span><i class="bi bi-chat-left-dots me-2"></i>AI Interview Questions</span>
+                    <form action="{{ url_for('recruiter.regenerate_interview_questions', app_id=application.id) }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-primary btn-sm px-3 shadow-sm">
+                            <i class="bi bi-arrow-repeat me-1"></i> Generate Questions
+                        </button>
+                    </form>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <p class="text-muted small mb-3">
+                        SmartHire generates questions tailored to this candidate's demonstrated background and the specific requirements of <strong>{{ job.title }}</strong>:
+                    </p>
+                    <ol class="list-group list-group-numbered list-group-flush">
+                        {% for question in interview_questions %}
+                        <li class="list-group-item px-0 py-3 border-bottom small text-dark" style="line-height: 1.6;">
+                            {{ question }}
+                        </li>
+                        {% else %}
+                        <li class="list-group-item px-0 py-3 text-muted small">
+                            No tailored questions generated yet. Click "Generate Questions" above to produce questions instantly.
+                        </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 3. AI Resume Improvement Feedback (Visible to Recruiter & Applicant) -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white">
+                    <span class="fw-bold"><i class="bi bi-lightbulb text-warning me-2"></i>AI Candidate Resume Feedback</span>
+                </div>
+                <div class="card-body">
+                    <div class="p-3 bg-light rounded text-muted small" style="white-space: pre-line; line-height: 1.6;">
+                        {{ application.ai_feedback }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Candidate Profile & Recruiter Actions -->
+        <div class="col-lg-5">
+            <!-- Recruiter Status Decision Card -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white">
+                    <span class="fw-bold"><i class="bi bi-check2-square text-primary me-2"></i>Recruitment Action</span>
+                </div>
+                <div class="card-body">
+                    <label class="form-label fw-semibold small text-muted mb-2">Update Candidate Decision</label>
+                    <div class="d-flex flex-column gap-2 mb-4">
+                        <form action="{{ url_for('recruiter.update_applicant_status', app_id=application.id) }}" method="POST">
+                            <input type="hidden" name="status" value="Shortlisted">
+                            <button type="submit" class="btn btn-outline-success w-100 text-start d-flex justify-content-between align-items-center py-2 {% if application.status == 'Shortlisted' %}active bg-success text-white{% endif %}">
+                                <span><i class="bi bi-check-circle-fill me-2"></i>Shortlist Candidate</span>
+                                <span class="badge bg-light text-success">Automated Email</span>
+                            </button>
+                        </form>
+
+                        <form action="{{ url_for('recruiter.update_applicant_status', app_id=application.id) }}" method="POST">
+                            <input type="hidden" name="status" value="On Hold">
+                            <button type="submit" class="btn btn-outline-warning w-100 text-start d-flex justify-content-between align-items-center py-2 {% if application.status == 'On Hold' %}active bg-warning text-white{% endif %}">
+                                <span><i class="bi bi-pause-circle-fill me-2"></i>Put On Hold</span>
+                                <span class="badge bg-light text-warning">Hold Notice</span>
+                            </button>
+                        </form>
+
+                        <form action="{{ url_for('recruiter.update_applicant_status', app_id=application.id) }}" method="POST">
+                            <input type="hidden" name="status" value="Rejected">
+                            <button type="submit" class="btn btn-outline-danger w-100 text-start d-flex justify-content-between align-items-center py-2 {% if application.status == 'Rejected' %}active bg-danger text-white{% endif %}">
+                                <span><i class="bi bi-x-circle-fill me-2"></i>Reject Application</span>
+                                <span class="badge bg-light text-danger">Notification</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Recruiter Notes Form -->
+                    <form action="{{ url_for('recruiter.update_recruiter_notes', app_id=application.id) }}" method="POST">
+                        <div class="mb-3">
+                            <label for="recruiter_notes" class="form-label fw-semibold small text-muted">Internal Recruiter Notes</label>
+                            <textarea class="form-control" id="recruiter_notes" name="recruiter_notes" rows="4" placeholder="Record interview notes, compensation discussions, or team impressions...">{{ application.recruiter_notes or '' }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-floppy me-1"></i> Save Recruiter Notes
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Structured Parsed Profile Card -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white">
+                    <span class="fw-bold"><i class="bi bi-person-lines-fill text-primary me-2"></i>Extracted Candidate Profile</span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <span class="text-muted small d-block">Contact Information:</span>
+                        <div class="small fw-semibold text-dark"><i class="bi bi-envelope me-1"></i>{{ application.applicant_email }}</div>
+                        {% if application.applicant_phone %}
+                        <div class="small fw-semibold text-dark"><i class="bi bi-telephone me-1"></i>{{ application.applicant_phone }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="text-muted small d-block">Estimated Experience:</span>
+                        <span class="fw-bold text-dark">{{ parsed_info.get('experience_years', 0) }} Year(s)</span>
+                    </div>
+
+                    {% if parsed_info.get('education') %}
+                    <div class="mb-3">
+                        <span class="text-muted small d-block mb-1">Education Credentials:</span>
+                        <ul class="list-unstyled mb-0 small">
+                            {% for edu in parsed_info.get('education') %}
+                            <li class="mb-1"><i class="bi bi-mortarboard text-muted me-1"></i>{{ edu }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {% if parsed_info.get('skills') %}
+                    <div class="mb-3">
+                        <span class="text-muted small d-block mb-1">All Detected Skills:</span>
+                        <div class="d-flex flex-wrap gap-1">
+                            {% for sk in parsed_info.get('skills') %}
+                            <span class="badge-skill">{{ sk }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if parsed_info.get('projects') %}
+                    <div class="mb-2">
+                        <span class="text-muted small d-block mb-1">Key Technical Highlights / Projects:</span>
+                        <ul class="list-unstyled mb-0 small text-muted">
+                            {% for proj in parsed_info.get('projects') %}
+                            <li class="mb-1">&bull; {{ proj }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

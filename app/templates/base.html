@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI-Powered Recruitment Agent — Intelligent Resume Screening &amp; Ranking{% endblock %}</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Official Theme CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Main Top Navbar (Aligned with Reference UI) -->
+    <nav class="navbar navbar-expand-lg navbar-smarthire sticky-top">
+        <div class="container-fluid px-lg-4">
+            <a class="navbar-brand" href="{{ url_for('main.home') }}">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="AI-Powered Recruitment Agent Logo">
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="bi bi-list fs-2 text-dark"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <!-- Navigation links matching screenshot exactly -->
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.home' %}active{% endif %}" href="{{ url_for('main.home') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.about' %}active{% endif %}" href="{{ url_for('main.about') }}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'applicant.jobs_list' %}active{% endif %}" href="{{ url_for('applicant.jobs_list') }}">Jobs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.how_it_works' %}active{% endif %}" href="{{ url_for('main.how_it_works') }}">How It Works</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.for_recruiters' %}active{% endif %}" href="{{ url_for('main.for_recruiters') }}">For Recruiters</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.ai_tools' %}active{% endif %}" href="{{ url_for('main.ai_tools') }}">AI Tools</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.contact' %}active{% endif %}" href="{{ url_for('main.contact') }}">Contact</a>
+                    </li>
+                </ul>
+
+                <!-- Auth Buttons / User Profile -->
+                <div class="d-flex align-items-center gap-2">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_recruiter %}
+                            <a href="{{ url_for('recruiter.dashboard') }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-speedometer2 me-1"></i> Recruiter Dashboard
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('applicant.dashboard') }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-person-lines-fill me-1"></i> Applicant Dashboard
+                            </a>
+                        {% endif %}
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="badge {% if current_user.is_recruiter %}bg-primary{% else %}bg-success{% endif %}">
+                                    {{ current_user.role|capitalize }}
+                                </span>
+                                <span class="fw-semibold text-dark">{{ current_user.full_name }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                                <li class="px-3 py-2 text-muted small border-bottom">
+                                    Signed in as<br><strong>{{ current_user.email }}</strong>
+                                </li>
+                                {% if current_user.is_recruiter %}
+                                    <li><a class="dropdown-item py-2" href="{{ url_for('recruiter.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                                    <li><a class="dropdown-item py-2" href="{{ url_for('recruiter.job_create') }}"><i class="bi bi-plus-circle me-2"></i>Post Job</a></li>
+                                    <li><a class="dropdown-item py-2" href="{{ url_for('recruiter.settings') }}"><i class="bi bi-sliders me-2"></i>API Settings</a></li>
+                                {% else %}
+                                    <li><a class="dropdown-item py-2" href="{{ url_for('applicant.dashboard') }}"><i class="bi bi-journal-text me-2"></i>My Applications</a></li>
+                                    <li><a class="dropdown-item py-2" href="{{ url_for('applicant.dashboard', tab='saved') }}"><i class="bi bi-bookmark me-2"></i>Saved Jobs</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger py-2" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Log Out</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-outline-primary px-3">Login</a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-primary px-3">Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow-1">
+        <!-- Flash Messages -->
+        <div class="container-fluid px-lg-4 mt-3">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert">
+                            <i class="bi {% if category == 'success' %}bi-check-circle-fill text-success{% elif category == 'danger' %}bi-exclamation-triangle-fill text-danger{% else %}bi-info-circle-fill text-primary{% endif %} me-2 fs-5"></i>
+                            <div>{{ message }}</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Official Footer (Aligned with Reference UI Page 1) -->
+    <footer class="footer-smarthire">
+        <div class="container-fluid px-lg-5">
+            <div class="row g-4 mb-4">
+                <div class="col-lg-4">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="AI-Powered Recruitment Agent" style="max-height: 48px; background: white; padding: 4px 8px; border-radius: 6px;" class="mb-3">
+                    <p class="text-secondary small pe-lg-4">
+                        AI-powered recruitment platform to help organizations streamline talent acquisition, screen resumes, and hire the best talent faster with high-accuracy matching.
+                    </p>
+                    <div class="d-flex gap-3 text-secondary fs-5 mt-3">
+                        <a href="https://facebook.com" target="_blank"><i class="bi bi-facebook"></i></a>
+                        <a href="https://twitter.com" target="_blank"><i class="bi bi-twitter-x"></i></a>
+                        <a href="https://linkedin.com" target="_blank"><i class="bi bi-linkedin"></i></a>
+                        <a href="https://instagram.com" target="_blank"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-6 col-lg-2 offset-lg-1">
+                    <h6>For Job Seekers</h6>
+                    <ul>
+                        <li><a href="{{ url_for('applicant.jobs_list') }}">Browse Jobs</a></li>
+                        <li><a href="{{ url_for('auth.register') }}">Create Profile</a></li>
+                        <li><a href="{{ url_for('main.ai_tools') }}">AI Resume Screening</a></li>
+                        <li><a href="{{ url_for('main.ai_tools') }}">Career Feedback</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-6 col-lg-2">
+                    <h6>For Recruiters</h6>
+                    <ul>
+                        <li><a href="{{ url_for('recruiter.job_create') }}">Post a Job</a></li>
+                        <li><a href="{{ url_for('recruiter.dashboard') }}">Browse Candidates</a></li>
+                        <li><a href="{{ url_for('recruiter.reports_hub') }}">Applicant Reports</a></li>
+                        <li><a href="{{ url_for('main.for_recruiters') }}">Recruitment Pricing</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-6 col-lg-3">
+                    <h6>Company</h6>
+                    <ul>
+                        <li><a href="{{ url_for('main.about') }}">About Us</a></li>
+                        <li><a href="{{ url_for('main.contact') }}">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr style="border-color: rgba(255, 255, 255, 0.1);">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center py-2 small text-secondary">
+                <div>&copy; 2026 AI-Powered Recruitment Agent. All rights reserved.</div>
+                <div class="mt-2 mt-md-0">
+                    <span class="badge badge-ai me-2"><i class="bi bi-stars"></i> Gemini AI &amp; Groq Free Tier</span>
+                    <span>PyMuPDF &bull; SQLite &bull; APScheduler</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom Application JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

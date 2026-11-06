@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Jobs — AI-Powered Recruitment Agent{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Top Search Header (Ref: UI Page 3) -->
+    <div class="bg-white p-4 p-md-5 rounded-3 border mb-4 shadow-sm text-center">
+        <h2 class="fw-bold mb-2">Browse Jobs</h2>
+        <p class="text-muted mb-4">Find the perfect job that matches your skills</p>
+        
+        <form method="GET" action="{{ url_for('applicant.jobs_list') }}" class="mx-auto" style="max-width: 820px;">
+            <div class="row g-2 justify-content-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="q" value="{{ query }}" class="form-control border-start-0" placeholder="Job Title or keyword">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-geo-alt text-muted"></i></span>
+                        <input type="text" name="location" value="{{ location }}" class="form-control border-start-0" placeholder="Location (e.g. Islamabad, Remote)">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        Search Jobs
+                    </button>
+                </div>
+            </div>
+            
+            {% if query or location or job_types or exp_levels or dept %}
+            <div class="mt-2 text-end">
+                <a href="{{ url_for('applicant.jobs_list') }}" class="small text-danger text-decoration-none">
+                    <i class="bi bi-x-circle me-1"></i> Clear all active filters
+                </a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="row g-4">
+        <!-- Filter Sidebar (Ref: UI Page 3 Left Sidebar) -->
+        <div class="col-lg-3">
+            <form method="GET" action="{{ url_for('applicant.jobs_list') }}">
+                <input type="hidden" name="q" value="{{ query }}">
+                <input type="hidden" name="location" value="{{ location }}">
+
+                <div class="card p-3 shadow-sm border mb-4">
+                    <h6 class="fw-bold mb-3 border-bottom pb-2">Filter Jobs</h6>
+
+                    <!-- Job Type -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Job Type</label>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="type" value="Full-time" id="typeFull" {% if 'Full-time' in job_types %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label small" for="typeFull">Full Time</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="type" value="Part-time" id="typePart" {% if 'Part-time' in job_types %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label small" for="typePart">Part Time</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="type" value="Remote" id="typeRemote" {% if 'Remote' in job_types %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label small" for="typeRemote">Remote</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="type" value="Internship" id="typeIntern" {% if 'Internship' in job_types %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label small" for="typeIntern">Internship</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="type" value="Contract" id="typeContract" {% if 'Contract' in job_types %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label small" for="typeContract">Contract</label>
+                        </div>
+                    </div>
+
+                    <!-- Experience Level -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Experience Level</label>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exp_level" value="entry" id="expEntry" {% if 'entry' in exp_levels %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label small" for="expEntry">Entry Level (0-1 yrs)</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exp_level" value="mid" id="expMid" {% if 'mid' in exp_levels %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label small" for="expMid">Mid Level (2-4 yrs)</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exp_level" value="senior" id="expSenior" {% if 'senior' in exp_levels %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label small" for="expSenior">Senior Level (5+ yrs)</label>
+                        </div>
+                    </div>
+
+                    <!-- Job Category / Department -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Job Category</label>
+                        {% for d in departments %}
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="dept" value="{{ d }}" id="dept_{{ loop.index }}" {% if dept == d %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label small" for="dept_{{ loop.index }}">{{ d }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Job Listings (Ref: UI Page 3 Horizontal Job Cards) -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted small">Showing <strong>{{ jobs|length }}</strong> available position{{ 's' if jobs|length != 1 else '' }}</span>
+            </div>
+
+            {% for job in jobs %}
+            <div class="job-card-row">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="company-logo-placeholder">
+                        <i class="bi bi-briefcase"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            <a href="{{ url_for('applicant.job_detail', job_id=job.id) }}" class="text-decoration-none text-dark">
+                                {{ job.title }}
+                            </a>
+                        </h5>
+                        <div class="text-muted small">
+                            <span>{{ job.department }}</span> &bull; 
+                            <i class="bi bi-geo-alt me-1"></i>{{ job.location }} &bull;
+                            <span class="badge bg-light text-secondary border ms-1">{{ job.employment_type }}</span>
+                        </div>
+                        <div class="d-flex flex-wrap gap-1 mt-2">
+                            {% for skill in job.get_skills_list()[:4] %}
+                            <span class="badge-skill" style="font-size: 0.75rem;">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column align-items-end gap-2">
+                    <!-- AI Match Score Pill (Ref: UI Page 3 92% Match Pill) -->
+                    <span class="badge badge-shortlisted py-2 px-3 fw-bold">
+                        <i class="bi bi-stars me-1 text-success"></i> 92% Match
+                    </span>
+                    
+                    <div class="d-flex gap-2">
+                        {% if current_user.is_authenticated %}
+                        <form method="POST" action="{{ url_for('applicant.toggle_save_job', job_id=job.id) }}" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2" title="Save Job">
+                                <i class="bi bi-bookmark{% if job.id in saved_job_ids %}-fill text-warning{% endif %}"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                        <a href="{{ url_for('applicant.job_detail', job_id=job.id) }}" class="btn btn-sm btn-primary py-1 px-3">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-5 bg-white rounded-3 border">
+                <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+                <h5 class="fw-bold">No Open Positions Match Your Filters</h5>
+                <p class="text-muted small">Try searching with broader terms or clear your active filters.</p>
+                <a href="{{ url_for('applicant.jobs_list') }}" class="btn btn-outline-primary btn-sm mt-2">
+                    View All Open Jobs
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

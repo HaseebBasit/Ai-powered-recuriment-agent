@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}System &amp; API Settings - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('recruiter.dashboard') }}" class="btn btn-sm btn-light border me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <h3 class="fw-bold mb-0" style="color: var(--sh-primary);">AI Engine &amp; Email Integrations</h3>
+                    <p class="text-muted small mb-0">Manage free tier API keys and Gmail SMTP automation configuration.</p>
+                </div>
+            </div>
+
+            <!-- Informational Banner -->
+            <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-info-circle-fill fs-4 me-3 text-info"></i>
+                <div class="small">
+                    <strong>Zero-Crash Guarantee:</strong> SmartHire features built-in intelligent NLP heuristic fallback parsers and a mock email notification logger. Even without API keys or SMTP passwords, the entire resume extraction, matching, ranking, and notification workflow executes seamlessly!
+                </div>
+            </div>
+
+            <form method="POST">
+                <!-- AI API Settings Card -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <span class="fw-bold"><i class="bi bi-stars text-primary me-2"></i>Generative AI Providers (Free Tier)</span>
+                        <span class="badge badge-ai">Gemini &bull; Groq Fallback</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label for="gemini_key" class="form-label fw-semibold small">Google Gemini API Key (Primary)</label>
+                            <input type="password" class="form-control" id="gemini_key" name="gemini_key" value="{{ gemini_key }}" placeholder="AIzaSy...">
+                            <div class="form-text small">Free tier API key obtained from <a href="https://aistudio.google.com/" target="_blank" rel="noopener">Google AI Studio</a>.</div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="groq_key" class="form-label fw-semibold small">Groq API Key (Secondary / Free Fallback)</label>
+                            <input type="password" class="form-control" id="groq_key" name="groq_key" value="{{ groq_key }}" placeholder="gsk_...">
+                            <div class="form-text small">Free tier high-speed LLM fallback from <a href="https://console.groq.com/" target="_blank" rel="noopener">Groq Cloud</a>. Activated automatically if Gemini rate-limits.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gmail SMTP Settings Card -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white">
+                        <span class="fw-bold"><i class="bi bi-envelope-at text-primary me-2"></i>Gmail SMTP Email Settings</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="mail_username" class="form-label fw-semibold small">Gmail Address</label>
+                                <input type="email" class="form-control" id="mail_username" name="mail_username" value="{{ mail_username }}" placeholder="yourname@gmail.com">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="mail_password" class="form-label fw-semibold small">Gmail App Password</label>
+                                <input type="password" class="form-control" id="mail_password" name="mail_password" placeholder="16-character App Password">
+                                <div class="form-text small">Use a Google 16-character App Password, not your standard Gmail login password.</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="mail_sender" class="form-label fw-semibold small">Default Sender Name &amp; Address</label>
+                            <input type="text" class="form-control" id="mail_sender" name="mail_sender" value="{{ mail_sender }}" placeholder="SmartHire Recruiter <noreply@smarthire.ai>">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('recruiter.dashboard') }}" class="btn btn-light border">Back to Dashboard</a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-floppy me-1"></i> Save Configurations
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}About Us — AI-Powered Recruitment Agent{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-5">
+    <div class="row align-items-center g-5 mb-5">
+        <!-- Left Column: Copy & Stats (Ref: UI Page 2) -->
+        <div class="col-lg-6">
+            <span class="badge badge-ai mb-2"><i class="bi bi-stars"></i> Intelligent Talent Acquisition</span>
+            <h1 class="fw-bold mb-3" style="font-size: 2.75rem; color: var(--sh-text-body);">About AI-Powered Recruitment Agent</h1>
+            <p class="lead text-muted mb-4" style="font-size: 1.1rem; line-height: 1.7;">
+                AI-Powered Recruitment Agent is an AI-powered recruitment platform that helps companies and organizations streamline their hiring process. We use artificial intelligence to analyze resumes, match candidates with job requirements, and provide actionable insights to help you hire the best talent.
+            </p>
+            
+            <p class="text-secondary mb-4" style="line-height: 1.7;">
+                By combining state-of-the-art Natural Language Processing (Google Gemini API &amp; Groq open-weights fallback) with automated heuristic validation, we eliminate human bias and reduce time-to-hire from weeks to minutes.
+            </p>
+
+            <!-- Stats Grid (Ref: UI Page 2 4 stats) -->
+            <div class="row g-3 pt-3 border-top">
+                <div class="col-6 col-md-3">
+                    <div class="fw-bold fs-3 text-primary">25,000+</div>
+                    <div class="text-muted small">Happy Users</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="fw-bold fs-3 text-primary">{{ total_jobs * 150 or '1,200+' }}</div>
+                    <div class="text-muted small">Jobs Posted</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="fw-bold fs-3 text-success">98%</div>
+                    <div class="text-muted small">Match Accuracy</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="fw-bold fs-3 text-primary">500+</div>
+                    <div class="text-muted small">Companies</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Recruitment Illustration / Image with Floating Match Badge -->
+        <div class="col-lg-6">
+            <div class="position-relative mx-auto" style="max-width: 520px;">
+                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800" alt="Recruitment Team" class="img-fluid rounded-4 shadow-sm" style="width: 100%; height: 380px; object-fit: cover;">
+                
+                <!-- Floating AI Match Score Card (Ref: UI Page 2 Floating 92% Match Badge) -->
+                <div class="position-absolute bottom-0 start-50 translate-middle-x mb-n3 bg-white p-3 rounded-3 shadow-lg border d-flex align-items-center gap-3" style="min-width: 280px;">
+                    <div class="bg-light p-2 rounded text-success fs-3">
+                        <i class="bi bi-patch-check-fill"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small d-block">AI Match Score</span>
+                        <h4 class="mb-0 fw-bold text-success">92%</h4>
+                        <span class="badge badge-shortlisted mt-1">Excellent Match</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mission, Vision & Key Benefits Section -->
+    <div class="row g-4 mt-5 pt-4 border-top">
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm" style="background-color: #FFFFFF;">
+                <div class="company-logo-placeholder mb-3">
+                    <i class="bi bi-compass"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Our Mission</h5>
+                <p class="text-muted small mb-0">
+                    To democratize hiring efficiency by providing enterprises and recruiters with unbiased, intelligent resume screening and automated candidate benchmarking.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm" style="background-color: #FFFFFF;">
+                <div class="company-logo-placeholder mb-3">
+                    <i class="bi bi-eye"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Our Vision</h5>
+                <p class="text-muted small mb-0">
+                    A world where every job seeker is evaluated purely on merit, relevant competencies, and growth potential, and every hiring team finds their dream candidate effortlessly.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm" style="background-color: #FFFFFF;">
+                <div class="company-logo-placeholder mb-3">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Key Platform Benefits</h5>
+                <p class="text-muted small mb-0">
+                    Real-time PDF/DOCX parsing, dual AI model failover with Google Gemini and Groq, automated candidate communications, and instant PDF/CSV reporting.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

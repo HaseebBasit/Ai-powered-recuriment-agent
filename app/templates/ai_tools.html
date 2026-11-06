@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}AI Tools — AI-Powered Recruitment Agent{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-5">
+    <!-- Header (Ref: UI Page 7 Header) -->
+    <div class="text-center mb-5">
+        <span class="badge badge-ai mb-2"><i class="bi bi-stars"></i> Intelligent Recruitment Automation</span>
+        <h1 class="fw-bold mb-2">AI Tools</h1>
+        <p class="text-muted">Powerful AI tools to make hiring easier and smarter.</p>
+    </div>
+
+    <!-- 3 Feature Cards (Ref: UI Page 7 3 Cards) -->
+    <div class="row g-4 mb-5">
+        <!-- Tool 1: AI Resume Screening -->
+        <div class="col-md-4">
+            <div class="card p-4 h-100 text-center d-flex flex-column justify-content-between shadow-sm border">
+                <div>
+                    <div class="company-logo-placeholder mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem; background: #EEF2FF; color: var(--sh-primary);">
+                        <i class="bi bi-file-earmark-person"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">AI Resume Screening</h5>
+                    <p class="text-muted small mb-4" style="line-height: 1.6;">
+                        Upload resume, extract key information, skills, and work experience automatically with multi-model NLP.
+                    </p>
+                </div>
+                <button type="button" class="btn btn-outline-primary py-2 w-100" data-bs-toggle="collapse" data-bs-target="#screeningTool">
+                    Try Now <i class="bi bi-chevron-down ms-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tool 2: Interview Questions -->
+        <div class="col-md-4">
+            <div class="card p-4 h-100 text-center d-flex flex-column justify-content-between shadow-sm border">
+                <div>
+                    <div class="company-logo-placeholder mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem; background: #ECFDF5; color: var(--sh-ai);">
+                        <i class="bi bi-chat-square-quote"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Interview Questions</h5>
+                    <p class="text-muted small mb-4" style="line-height: 1.6;">
+                        Generate role-specific and tailored behavioral &amp; technical interview questions based on job description.
+                    </p>
+                </div>
+                <button type="button" class="btn btn-outline-primary py-2 w-100" data-bs-toggle="collapse" data-bs-target="#questionsTool">
+                    Try Now <i class="bi bi-chevron-down ms-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tool 3: Resume Feedback -->
+        <div class="col-md-4">
+            <div class="card p-4 h-100 text-center d-flex flex-column justify-content-between shadow-sm border">
+                <div>
+                    <div class="company-logo-placeholder mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem; background: #FFFBEB; color: var(--sh-amber);">
+                        <i class="bi bi-file-earmark-diff"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Resume Feedback</h5>
+                    <p class="text-muted small mb-4" style="line-height: 1.6;">
+                        Get AI-powered suggestions to improve your resume, close skill gaps, and increase your match score.
+                    </p>
+                </div>
+                <button type="button" class="btn btn-outline-primary py-2 w-100" data-bs-toggle="collapse" data-bs-target="#feedbackTool">
+                    Try Now <i class="bi bi-chevron-down ms-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collapsible Interactive Tool Workspaces -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Screening Tool Panel -->
+            <div class="collapse {% if tool_type == 'screening' or (result and result.type == 'screening') %}show{% endif %} mb-4" id="screeningTool">
+                <div class="card p-4 shadow-sm border">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-person text-primary me-2"></i>Live AI Resume Screening</h5>
+                    <form method="POST" action="{{ url_for('main.ai_tools') }}" enctype="multipart/form-data">
+                        <input type="hidden" name="action" value="screen_resume">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Target Job Role</label>
+                                <input type="text" name="target_role" class="form-control" value="Python Developer" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Required Competencies (Comma Separated)</label>
+                                <input type="text" name="required_skills" class="form-control" value="Python, Flask, SQL, Docker, Git" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold">Select Candidate Resume (PDF or DOCX)</label>
+                                <input type="file" name="resume" class="form-control" accept=".pdf,.docx" required>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-stars me-1"></i> Screen Resume with AI
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Questions Tool Panel -->
+            <div class="collapse {% if tool_type == 'questions' or (result and result.type == 'questions') %}show{% endif %} mb-4" id="questionsTool">
+                <div class="card p-4 shadow-sm border">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-chat-square-quote text-success me-2"></i>Generate Role-Tailored Interview Questions</h5>
+                    <form method="POST" action="{{ url_for('main.ai_tools') }}">
+                        <input type="hidden" name="action" value="generate_questions">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Job Role Title</label>
+                                <input type="text" name="job_title" class="form-control" value="Senior Backend Engineer" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Candidate Known Skills</label>
+                                <input type="text" name="candidate_skills" class="form-control" value="Python, PostgreSQL, AWS, Microservices" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold">Job Description Summary</label>
+                                <textarea name="job_desc" class="form-control" rows="3" required>We need an experienced developer to architect resilient microservices, scale databases, and mentor juniors.</textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-stars me-1"></i> Generate Tailored Questions
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Feedback Tool Panel -->
+            <div class="collapse {% if tool_type == 'feedback' or (result and result.type == 'feedback') %}show{% endif %} mb-4" id="feedbackTool">
+                <div class="card p-4 shadow-sm border">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-diff text-warning me-2"></i>Get Actionable AI Resume Feedback</h5>
+                    <form method="POST" action="{{ url_for('main.ai_tools') }}" enctype="multipart/form-data">
+                        <input type="hidden" name="action" value="resume_feedback">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Target Job Role</label>
+                                <input type="text" name="job_title" class="form-control" value="Full Stack Developer" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Select Resume (PDF or DOCX)</label>
+                                <input type="file" name="resume" class="form-control" accept=".pdf,.docx" required>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-stars me-1"></i> Analyze &amp; Get Feedback
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results Output Section -->
+            {% if result %}
+            <div class="card p-4 shadow-sm border mt-4 bg-light">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-check-circle-fill text-success me-2"></i>AI Analysis Results</h5>
+                    <span class="badge badge-ai"><i class="bi bi-cpu"></i> Processed with Dual Model Engine</span>
+                </div>
+
+                {% if result.type == 'screening' %}
+                <div class="bg-white p-3 rounded-3 border mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-0">{{ result.parsed.name or 'Candidate Profile' }}</h5>
+                            <span class="text-muted small">{{ result.parsed.email }} &bull; {{ result.parsed.phone }}</span>
+                        </div>
+                        <div class="text-end">
+                            <span class="fs-3 fw-bold text-success">{{ result.screening.match_score }}%</span>
+                            <div class="small text-muted">Compatibility Score</div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold mb-2">Screening Summary</h6>
+                    <p class="text-secondary small mb-3">{{ result.screening.match_justification }}</p>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <span class="text-muted small d-block mb-1 fw-bold">Matching Competencies</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for s in result.screening.matching_skills %}
+                                <span class="badge-skill badge-skill-match">{{ s }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small d-block mb-1 fw-bold">Missing or Desired Skills</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for s in result.screening.missing_skills %}
+                                <span class="badge-skill badge-skill-missing">{{ s }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% elif result.type == 'questions' %}
+                <div class="bg-white p-3 rounded-3 border">
+                    <h6 class="fw-bold mb-3">Tailored Interview Questions for {{ result.job_title }}</h6>
+                    <ol class="ps-3 mb-0" style="line-height: 1.8;">
+                        {% for q in result.questions %}
+                        <li class="mb-2 text-dark">{{ q }}</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+
+                {% elif result.type == 'feedback' %}
+                <div class="bg-white p-3 rounded-3 border">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0">ATS Optimization Suggestions</h6>
+                        <span class="fs-4 fw-bold text-primary">{{ result.score }}% Estimated Match</span>
+                    </div>
+                    <p class="text-secondary" style="line-height: 1.7; white-space: pre-line;">{{ result.feedback }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

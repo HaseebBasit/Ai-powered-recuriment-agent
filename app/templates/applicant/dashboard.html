@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Applicant Dashboard — AI-Powered Recruitment Agent{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Left Sidebar (Ref: UI Page 5 Left Sidebar) -->
+    <aside class="sidebar-navy">
+        <div class="sidebar-brand">
+            <i class="bi bi-person-circle fs-4 me-2"></i>
+            <span>Applicant Portal</span>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('applicant.dashboard') }}" class="sidebar-nav-link {% if tab == 'applications' %}active{% endif %}">
+                    <i class="bi bi-grid-fill"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('applicant.dashboard', tab='applications') }}" class="sidebar-nav-link">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>My Applications</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('applicant.dashboard', tab='saved') }}" class="sidebar-nav-link {% if tab == 'saved' %}active{% endif %}">
+                    <i class="bi bi-bookmark-fill"></i>
+                    <span>Saved Jobs</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('main.ai_tools') }}" class="sidebar-nav-link">
+                    <i class="bi bi-cpu"></i>
+                    <span>AI Resume Tools</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('applicant.jobs_list') }}" class="sidebar-nav-link">
+                    <i class="bi bi-briefcase"></i>
+                    <span>Browse Jobs</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item mt-4 pt-3 border-top border-secondary">
+                <a href="{{ url_for('auth.logout') }}" class="sidebar-nav-link text-danger">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-main">
+        <!-- Top Welcome Header (Ref: UI Page 5 Welcome Header) -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Welcome, {{ current_user.full_name }} 👋</h3>
+                <p class="text-muted small mb-0">Find your dream job today and view your AI compatibility scores.</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <div class="text-end d-none d-sm-block">
+                    <div class="fw-bold small">{{ current_user.full_name }}</div>
+                    <span class="text-muted small" style="font-size: 11px;">Candidate</span>
+                </div>
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120" alt="Avatar" class="rounded-circle border" style="width: 44px; height: 44px; object-fit: cover;">
+            </div>
+        </div>
+
+        <!-- 4 Feature Cards Row (Ref: UI Page 5 4 White Cards) -->
+        <div class="row g-3 mb-4">
+            <!-- Card 1: AI Resume Screening -->
+            <div class="col-6 col-lg-3">
+                <div class="card p-3 h-100 text-center d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="company-logo-placeholder mx-auto mb-2 text-primary" style="background: #EEF2FF;">
+                            <i class="bi bi-file-earmark-person"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1">AI Resume Screening</h6>
+                        <p class="text-muted small mb-3" style="font-size: 11px; line-height: 1.4;">
+                            Extract key information, skills, and work experience from resumes.
+                        </p>
+                    </div>
+                    <a href="{{ url_for('main.ai_tools') }}" class="btn btn-sm btn-outline-primary py-1">Try Now</a>
+                </div>
+            </div>
+
+            <!-- Card 2: My Applications -->
+            <div class="col-6 col-lg-3">
+                <div class="card p-3 h-100 text-center d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="fs-3 fw-bold text-primary mb-1">{{ '%02d' % total_apps }}</div>
+                        <h6 class="fw-bold mb-1">My Applications</h6>
+                        <p class="text-muted small mb-3" style="font-size: 11px; line-height: 1.4;">
+                            Track your active applications, match scores, and interview statuses.
+                        </p>
+                    </div>
+                    <a href="#applicationsTable" class="btn btn-sm btn-outline-primary py-1">View All</a>
+                </div>
+            </div>
+
+            <!-- Card 3: Saved Jobs -->
+            <div class="col-6 col-lg-3">
+                <div class="card p-3 h-100 text-center d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="fs-3 fw-bold text-success mb-1">{{ '%02d' % saved_jobs|length }}</div>
+                        <h6 class="fw-bold mb-1">Saved Jobs</h6>
+                        <p class="text-muted small mb-3" style="font-size: 11px; line-height: 1.4;">
+                            Review your bookmarked jobs and apply with one click.
+                        </p>
+                    </div>
+                    <a href="{{ url_for('applicant.dashboard', tab='saved') }}" class="btn btn-sm btn-outline-primary py-1">View Saved</a>
+                </div>
+            </div>
+
+            <!-- Card 4: Interview Preparation -->
+            <div class="col-6 col-lg-3">
+                <div class="card p-3 h-100 text-center d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="fs-3 fw-bold text-info mb-1">01</div>
+                        <h6 class="fw-bold mb-1">Interview Prep</h6>
+                        <p class="text-muted small mb-3" style="font-size: 11px; line-height: 1.4;">
+                            Get AI-generated role-specific questions and tailored answers.
+                        </p>
+                    </div>
+                    <a href="{{ url_for('main.ai_tools') }}?tool=questions" class="btn btn-sm btn-outline-primary py-1">Practice Now</a>
+                </div>
+            </div>
+        </div>
+
+        {% if tab == 'saved' %}
+        <!-- Saved Jobs View -->
+        <div class="card p-4 shadow-sm border mb-4">
+            <h5 class="fw-bold mb-3">Saved Positions ({{ saved_jobs|length }})</h5>
+            {% if saved_jobs %}
+                <div class="row g-3">
+                    {% for job in saved_jobs %}
+                    <div class="col-md-6">
+                        <div class="card p-3 h-100 border bg-light">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="fw-bold mb-0">{{ job.title }}</h6>
+                                <span class="badge bg-light text-primary border">{{ job.employment_type }}</span>
+                            </div>
+                            <div class="text-muted small mb-2">{{ job.department }} &bull; {{ job.location }}</div>
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
+                                <form method="POST" action="{{ url_for('applicant.toggle_save_job', job_id=job.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size: 11px;">
+                                        <i class="bi bi-trash me-1"></i> Remove
+                                    </button>
+                                </form>
+                                <a href="{{ url_for('applicant.job_detail', job_id=job.id) }}" class="btn btn-sm btn-primary py-1 px-3">
+                                    Apply Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted small mb-0">You have not bookmarked any jobs yet. <a href="{{ url_for('applicant.jobs_list') }}">Browse open positions</a></p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Applications Table Section (Ref: UI Page 5 Bottom Table) -->
+        <div class="card shadow-sm border" id="applicationsTable">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="fw-bold mb-0">My Applications ({{ applications|length }})</h5>
+                <a href="{{ url_for('applicant.jobs_list') }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Apply to More Jobs
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-smarthire align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Job Role</th>
+                            <th>Applied On</th>
+                            <th>AI Match Score</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-dark">{{ app.job.title }}</div>
+                                <div class="text-muted small">{{ app.job.department }} &bull; {{ app.job.location }}</div>
+                            </td>
+                            <td class="text-muted small">
+                                {{ app.applied_at.strftime('%b %d, %Y') }}
+                            </td>
+                            <td style="min-width: 170px;">
+                                <div class="score-bar-wrapper">
+                                    <div class="score-progress">
+                                        <div class="score-progress-bar score-{{ app.score_color_class }}" style="width: {{ app.match_score }}%;"></div>
+                                    </div>
+                                    <span class="score-label score-{{ app.score_color_class }}">{{ app.match_score }}%</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge {{ app.status_badge_class }}">
+                                    {{ app.status }}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <a href="{{ url_for('applicant.feedback', app_id=app.id) }}" class="btn btn-sm btn-outline-primary py-1 px-2">
+                                    <i class="bi bi-stars me-1 text-primary"></i> View Feedback
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <i class="bi bi-journal-x fs-1 text-muted d-block mb-2"></i>
+                                <h6 class="fw-bold">No Applications Submitted Yet</h6>
+                                <p class="text-muted small">Browse open roles and submit your resume to see real-time AI scoring.</p>
+                                <a href="{{ url_for('applicant.jobs_list') }}" class="btn btn-sm btn-primary">Browse Jobs</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
