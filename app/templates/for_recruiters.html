@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}For Recruiters — AI Powered Recruitment Agent{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background-color: #F8FAFC;">
+    <div class="container-fluid px-lg-5">
+        <div class="text-center mb-5">
+            <div class="hero-pill d-inline-block mb-3">
+                <i class="bi bi-stars text-primary me-2"></i> For Recruiters
+            </div>
+            <h1 class="fw-bold mb-2">Screen Smarter. Hire Faster.</h1>
+            <p class="text-muted">Let AI do the first round of resume screening while you make the final decision.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 p-4">
+                    <h5 class="fw-bold mb-2"><i class="bi bi-briefcase text-primary me-2"></i>Post and Manage Jobs</h5>
+                    <p class="text-muted small mb-0">Create, edit, close and delete postings with title, description, required skills and minimum experience.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 p-4">
+                    <h5 class="fw-bold mb-2"><i class="bi bi-cpu me-2" style="color:#0D9488;"></i>AI Match Scores <span class="badge badge-ai">AI</span></h5>
+                    <p class="text-muted small mb-0">Every resume is scored from 0 to 100 with a short explanation of strengths and missing skills.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 p-4">
+                    <h5 class="fw-bold mb-2"><i class="bi bi-list-ol text-primary me-2"></i>Ranked Applicant List</h5>
+                    <p class="text-muted small mb-0">See the best candidates first and filter by score, skill and experience.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 p-4">
+                    <h5 class="fw-bold mb-2"><i class="bi bi-check2-circle text-primary me-2"></i>You Make the Decision</h5>
+                    <p class="text-muted small mb-2">Shortlist, reject or put candidates on hold.</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-success">Shortlisted</span>
+                        <span class="badge" style="background:#F59E0B; color:#1E293B;">On Hold</span>
+                        <span class="badge bg-danger">Rejected</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 p-4">
+                    <h5 class="fw-bold mb-2"><i class="bi bi-chat-quote me-2" style="color:#0D9488;"></i>Interview Questions <span class="badge badge-ai">AI</span></h5>
+                    <p class="text-muted small mb-0">Get tailored technical and behavioral questions for every shortlisted candidate.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 p-4">
+                    <h5 class="fw-bold mb-2"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Reports and Dashboard</h5>
+                    <p class="text-muted small mb-0">Export the ranked list as CSV or PDF, track applications per job, average score and common skills, and get a daily email summary.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="{{ url_for('recruiter.job_create') }}" class="btn btn-primary px-4 py-2">Post a Job</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

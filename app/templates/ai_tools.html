@@ -17,7 +17,7 @@
         <div class="col-md-4">
             <div class="card p-4 h-100 text-center d-flex flex-column justify-content-between shadow-sm border">
                 <div>
-                    <div class="company-logo-placeholder mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem; background: #EEF2FF; color: var(--sh-primary);">
+                    <div class="company-logo-placeholder mx-auto mb-3" style="width: 72px; height: 72px; font-size: 2.25rem; background: #EEF2FF; color: var(--sh-primary);">
                         <i class="bi bi-file-earmark-person"></i>
                     </div>
                     <h5 class="fw-bold mb-2">AI Resume Screening</h5>
@@ -35,7 +35,7 @@
         <div class="col-md-4">
             <div class="card p-4 h-100 text-center d-flex flex-column justify-content-between shadow-sm border">
                 <div>
-                    <div class="company-logo-placeholder mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem; background: #ECFDF5; color: var(--sh-ai);">
+                    <div class="company-logo-placeholder mx-auto mb-3" style="width: 72px; height: 72px; font-size: 2.25rem; background: #ECFDF5; color: var(--sh-ai);">
                         <i class="bi bi-chat-square-quote"></i>
                     </div>
                     <h5 class="fw-bold mb-2">Interview Questions</h5>
@@ -53,7 +53,7 @@
         <div class="col-md-4">
             <div class="card p-4 h-100 text-center d-flex flex-column justify-content-between shadow-sm border">
                 <div>
-                    <div class="company-logo-placeholder mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem; background: #FFFBEB; color: var(--sh-amber);">
+                    <div class="company-logo-placeholder mx-auto mb-3" style="width: 72px; height: 72px; font-size: 2.25rem; background: #FFFBEB; color: var(--sh-amber);">
                         <i class="bi bi-file-earmark-diff"></i>
                     </div>
                     <h5 class="fw-bold mb-2">Resume Feedback</h5>
@@ -68,23 +68,26 @@
         </div>
     </div>
 
-    <!-- Collapsible Interactive Tool Workspaces -->
+    <!-- Collapsible Interactive Tool Workspaces (only one open at a time) -->
     <div class="row justify-content-center">
-        <div class="col-lg-10">
+        <div class="col-lg-10" id="toolPanels">
             <!-- Screening Tool Panel -->
-            <div class="collapse {% if tool_type == 'screening' or (result and result.type == 'screening') %}show{% endif %} mb-4" id="screeningTool">
+            <div class="collapse {% if tool_type == 'screening' or (result and result.type == 'screening') %}show{% endif %} mb-4" id="screeningTool" data-bs-parent="#toolPanels">
                 <div class="card p-4 shadow-sm border">
-                    <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-person text-primary me-2"></i>Live AI Resume Screening</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-file-earmark-person text-primary me-2"></i>Live AI Resume Screening</h5>
+                        <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#screeningTool" aria-label="Close"></button>
+                    </div>
                     <form method="POST" action="{{ url_for('main.ai_tools') }}" enctype="multipart/form-data">
                         <input type="hidden" name="action" value="screen_resume">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Target Job Role</label>
-                                <input type="text" name="target_role" class="form-control" value="Python Developer" required>
+                                <input type="text" name="target_role" class="form-control" placeholder="e.g. Python Developer" value="{{ request.form.get('target_role', '') }}" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Required Competencies (Comma Separated)</label>
-                                <input type="text" name="required_skills" class="form-control" value="Python, Flask, SQL, Docker, Git" required>
+                                <input type="text" name="required_skills" class="form-control" placeholder="e.g. Python, Flask, SQL, Docker, Git" value="{{ request.form.get('required_skills', '') }}" required>
                             </div>
                             <div class="col-12">
                                 <label class="form-label small fw-bold">Select Candidate Resume (PDF or DOCX)</label>
@@ -101,23 +104,26 @@
             </div>
 
             <!-- Questions Tool Panel -->
-            <div class="collapse {% if tool_type == 'questions' or (result and result.type == 'questions') %}show{% endif %} mb-4" id="questionsTool">
+            <div class="collapse {% if tool_type == 'questions' or (result and result.type == 'questions') %}show{% endif %} mb-4" id="questionsTool" data-bs-parent="#toolPanels">
                 <div class="card p-4 shadow-sm border">
-                    <h5 class="fw-bold mb-3"><i class="bi bi-chat-square-quote text-success me-2"></i>Generate Role-Tailored Interview Questions</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-chat-square-quote text-success me-2"></i>Generate Role-Tailored Interview Questions</h5>
+                        <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#questionsTool" aria-label="Close"></button>
+                    </div>
                     <form method="POST" action="{{ url_for('main.ai_tools') }}">
                         <input type="hidden" name="action" value="generate_questions">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Job Role Title</label>
-                                <input type="text" name="job_title" class="form-control" value="Senior Backend Engineer" required>
+                                <input type="text" name="job_title" class="form-control" placeholder="e.g. Senior Backend Engineer" value="{{ request.form.get('job_title', '') if request.form.get('action') == 'generate_questions' else '' }}" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Candidate Known Skills</label>
-                                <input type="text" name="candidate_skills" class="form-control" value="Python, PostgreSQL, AWS, Microservices" required>
+                                <input type="text" name="candidate_skills" class="form-control" placeholder="e.g. Python, PostgreSQL, AWS, Microservices" value="{{ request.form.get('candidate_skills', '') }}" required>
                             </div>
                             <div class="col-12">
                                 <label class="form-label small fw-bold">Job Description Summary</label>
-                                <textarea name="job_desc" class="form-control" rows="3" required>We need an experienced developer to architect resilient microservices, scale databases, and mentor juniors.</textarea>
+                                <textarea name="job_desc" class="form-control" rows="3" placeholder="e.g. We need an experienced developer to architect resilient microservices, scale databases, and mentor juniors." required>{{ request.form.get('job_desc', '') }}</textarea>
                             </div>
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary">
@@ -130,15 +136,18 @@
             </div>
 
             <!-- Feedback Tool Panel -->
-            <div class="collapse {% if tool_type == 'feedback' or (result and result.type == 'feedback') %}show{% endif %} mb-4" id="feedbackTool">
+            <div class="collapse {% if tool_type == 'feedback' or (result and result.type == 'feedback') %}show{% endif %} mb-4" id="feedbackTool" data-bs-parent="#toolPanels">
                 <div class="card p-4 shadow-sm border">
-                    <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-diff text-warning me-2"></i>Get Actionable AI Resume Feedback</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-file-earmark-diff text-warning me-2"></i>Get Actionable AI Resume Feedback</h5>
+                        <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#feedbackTool" aria-label="Close"></button>
+                    </div>
                     <form method="POST" action="{{ url_for('main.ai_tools') }}" enctype="multipart/form-data">
                         <input type="hidden" name="action" value="resume_feedback">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Target Job Role</label>
-                                <input type="text" name="job_title" class="form-control" value="Full Stack Developer" required>
+                                <input type="text" name="job_title" class="form-control" placeholder="e.g. Full Stack Developer" value="{{ request.form.get('job_title', '') if request.form.get('action') == 'resume_feedback' else '' }}" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Select Resume (PDF or DOCX)</label>
@@ -156,10 +165,13 @@
 
             <!-- Results Output Section -->
             {% if result %}
-            <div class="card p-4 shadow-sm border mt-4 bg-light">
+            <div class="card p-4 shadow-sm border mt-4 bg-light" id="resultCard">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-check-circle-fill text-success me-2"></i>AI Analysis Results</h5>
-                    <span class="badge badge-ai"><i class="bi bi-cpu"></i> Processed with Dual Model Engine</span>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge badge-ai"><i class="bi bi-cpu"></i> Processed with Dual Model Engine</span>
+                        <button type="button" class="btn-close" aria-label="Close results" onclick="document.getElementById('resultCard').remove();"></button>
+                    </div>
                 </div>
 
                 {% if result.type == 'screening' %}
@@ -224,3 +236,13 @@
 </div>
 {% endblock %}
 
+{% block extra_js %}
+<script>
+    // When a tool panel opens, scroll to it so the user does not have to search for it
+    document.querySelectorAll('#toolPanels .collapse').forEach(function (panel) {
+        panel.addEventListener('shown.bs.collapse', function () {
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+</script>
+{% endblock %}

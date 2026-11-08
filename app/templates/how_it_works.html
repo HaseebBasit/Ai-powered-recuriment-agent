@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}How It Works — AI Powered Recruitment Agent{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background-color: #F8FAFC;">
+    <div class="container-fluid px-lg-5">
+        <div class="text-center mb-5">
+            <div class="hero-pill d-inline-block mb-3">
+                <i class="bi bi-stars text-primary me-2"></i> How It Works
+            </div>
+            <h1 class="fw-bold mb-2">From Resume to Ranked Shortlist</h1>
+            <p class="text-muted">Six simple steps, powered by AI, with the final decision always yours.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="step-card h-100">
+                    <div class="step-number">1</div>
+                    <h5 class="fw-bold mb-2">Post a Job</h5>
+                    <p class="text-muted small mb-0">Recruiters add the title, description, required skills and minimum experience.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="step-card h-100">
+                    <div class="step-number">2</div>
+                    <h5 class="fw-bold mb-2">Apply with a Resume</h5>
+                    <p class="text-muted small mb-0">Applicants browse open jobs and upload a PDF or DOCX resume.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="step-card h-100">
+                    <div class="step-number">3</div>
+                    <h5 class="fw-bold mb-2">AI Reads the Resume</h5>
+                    <p class="text-muted small mb-0">The AI extracts skills, education, experience and projects.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="step-card h-100">
+                    <div class="step-number">4</div>
+                    <h5 class="fw-bold mb-2">Match Score</h5>
+                    <p class="text-muted small mb-0">Each applicant gets a 0–100 score with strengths and missing skills explained.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="step-card h-100">
+                    <div class="step-number">5</div>
+                    <h5 class="fw-bold mb-2">Review and Decide</h5>
+                    <p class="text-muted small mb-0">Recruiters see a ranked list and shortlist, reject or hold candidates.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="step-card h-100">
+                    <div class="step-number">6</div>
+                    <h5 class="fw-bold mb-2">Questions and Emails</h5>
+                    <p class="text-muted small mb-0">Interview questions are prepared and applicants receive automatic status emails.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5 d-flex flex-wrap justify-content-center gap-3">
+            <a href="{{ url_for('applicant.jobs_list') }}" class="btn btn-primary px-4 py-2">Find Jobs</a>
+            <a href="{{ url_for('recruiter.job_create') }}" class="btn btn-outline-primary px-4 py-2">Post a Job</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
