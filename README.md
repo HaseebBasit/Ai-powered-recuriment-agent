@@ -258,9 +258,3 @@ python test_app.py
 | Applied / new | Sky Blue `#0EA5E9` |
 | Background / surfaces / borders | `#F8FAFC` / `#FFFFFF` / `#E2E8F0` |
 | Body text / muted text | `#1E293B` / `#64748B` |
-
----
-
-## License
-
-MIT. See the `LICENSE` file.
